@@ -2,6 +2,7 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from "vscode";
 import { subscribeToDocumentChanges, REQDEF_MENTION } from './diagnostics';
+import { ReqIDOutlineProvider } from "./reqIdView"
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -41,10 +42,14 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
 	vscode.languages.registerCodeActionsProvider("markdown", new ReqDefInfo(), {
 		providedCodeActionKinds: ReqDefInfo.providedCodeActionKinds
-	})
-);
+	}));
 
   subscribeToDocumentChanges(context, reqDefDiagnostics);
+  const reqIdProvider = new ReqIDOutlineProvider(context, reqDefDiagnostics);
+  //context.subscriptions.push();
+  vscode.window.registerTreeDataProvider("ReqIdView", reqIdProvider);
+  vscode.commands.registerCommand('ReqIdView.refresh', () => reqIdProvider.refresh());
+  vscode.commands.registerCommand('extension.openReqIdSelection', range => reqIdProvider.select(range));
 }
 
 interface MyInlineCompletionItem extends vscode.InlineCompletionItem {

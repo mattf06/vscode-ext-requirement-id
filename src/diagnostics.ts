@@ -58,24 +58,26 @@ function createDiagnostic(
   );
 
   const diagnostic = new vscode.Diagnostic(range, lineOfText.text, severity);
+
   if (severity === vscode.DiagnosticSeverity.Error) {
-    diagnostic.message = "cannot have already defined requirement!";
     const range2 = new vscode.Range(
       lineIndex,
       lineOfText.text.length - 4,
       lineIndex,
       lineOfText.text.length
     );
-	diagnostic.range = range2;
+    diagnostic.message = "cannot have already defined requirement!";
+    diagnostic.range = range2;
     diagnostic.relatedInformation = [
       new vscode.DiagnosticRelatedInformation(
         new vscode.Location(doc.uri, range2),
         "duplicated id"
       ),
     ];
-	diagnostic.source = lineOfText.text;
   }
+  diagnostic.source = lineOfText.text;
   diagnostic.code = REQDEF_MENTION;
+  console.log("createDiag: " + diagnostic.source);
   return diagnostic;
 }
 
@@ -112,7 +114,10 @@ export function subscribeToDocumentChanges(
 
 function alreadyExist(diagnostics: vscode.Diagnostic[], text: string): boolean {
   for (let i = 0; i < diagnostics.length; i++) {
-    if (diagnostics[i].code === REQDEF_MENTION && diagnostics[i].message.includes(text)) {
+    if (
+      diagnostics[i].code === REQDEF_MENTION &&
+      diagnostics[i].message.includes(text)
+    ) {
       return true;
     }
   }
