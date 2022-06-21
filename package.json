@@ -6,6 +6,10 @@
 	"displayName": "ReqDef",
 	"description": "Helper to numbering requirement definition",
 	"version": "0.0.1",
+	"repository": {
+		"type": "git",
+		"url": "http://mattf06.hd.free.fr:7808/git/matt/VSCodeRequirementExtension.git"
+	},
 	"engines": {
 		"vscode": "^1.68.0"
 	},
