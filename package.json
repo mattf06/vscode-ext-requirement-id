@@ -2,13 +2,13 @@
 	"enabledApiProposals": [
 		"inlineCompletions"
 	],
-	"name": "reqdef",
-	"displayName": "ReqDef",
-	"description": "Helper to numbering requirement definition",
+	"name": "soar-reqdef",
+	"displayName": "SOARRequirementHelper",
+	"description": "SOAR Helper for requirement definition",
 	"version": "0.0.1",
 	"repository": {
 		"type": "git",
-		"url": "http://mattf06.hd.free.fr:7808/git/matt/VSCodeRequirementExtension.git"
+		"url": "https://github.com/mattf06/vscode-ext-requirement-id.git"
 	},
 	"engines": {
 		"vscode": "^1.68.0"
