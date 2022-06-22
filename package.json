@@ -22,29 +22,11 @@
 	],
 	"main": "./out/extension.js",
 	"contributes": {
-		"viewsContainers": {
-			"activitybar": [
-				{
-					"id": "package-explorer",
-					"title": "ID Explorer",
-					"icon": "media/icon.svg"
-				}
-			]
-		},
 		"views": {
-			"package-explorer": [
-				{
-					"id": "reqidExplorer",
-					"name": "ID Explorer",
-					"icon": "media/icon.svg",
-					"contextualTitle": "ID Explorer",
-					"visibility": "visible"
-				}
-			],
 			"explorer": [
 				{
 					"id": "ReqIdView",
-					"name": "Requirements",
+					"name": "SOAR Requirements",
 					"visibility": "visible"
 				}
 			]
