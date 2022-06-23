@@ -36,15 +36,15 @@ export class ReqIDOutlineProvider
     private onActiveEditorChanged(): void {
         if (vscode.window.activeTextEditor) {
             if (vscode.window.activeTextEditor.document.uri.scheme === "file") {
-                const enabled = true; //vscode.window.activeTextEditor.document.languageId === "markdown";
-                //vscode.commands.executeCommand('setContext', 'jsonOutlineEnabled', enabled);
+                const enabled = vscode.window.activeTextEditor.document.languageId === "markdown";
+                vscode.commands.executeCommand('setContext', 'reqidOutlineEnabled', enabled);
                 if (enabled) {
                     this.editor = vscode.window.activeTextEditor;
                     this.refresh();
                 }
             }
         } else {
-            //vscode.commands.executeCommand('setContext', 'jsonOutlineEnabled', false);
+            vscode.commands.executeCommand('setContext', 'reqidOutlineEnabled',false);
         }
     }
 
@@ -61,8 +61,8 @@ export class ReqIDOutlineProvider
     }
 
     public refresh(): void {
-        /*
         console.log("refresh");
+        /*
         if (this.editor && this._diagnostics.has(this.editor.document.uri)) {
             const diagnostics: vscode.Diagnostic[] = [];
             this._diagnostics

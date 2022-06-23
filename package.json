@@ -5,7 +5,9 @@
 	"name": "soar-reqdef",
 	"displayName": "SOARRequirementHelper",
 	"description": "SOAR Helper for requirement definition",
-	"version": "0.0.1",
+	"version": "0.0.2",
+	"private": true,
+	"license": "MIT",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/mattf06/vscode-ext-requirement-id.git"
@@ -27,7 +29,8 @@
 				{
 					"id": "ReqIdView",
 					"name": "SOAR Requirements",
-					"visibility": "visible"
+					"visibility": "visible",
+					"when": "reqidOutlineEnabled"
 				}
 			]
 		},
@@ -38,6 +41,27 @@
 				"icon": {
 					"light": "resources/light/refresh.svg",
 					"dark": "resources/dark/refresh.svg"
+				}
+			}
+		],
+		"menus": {
+			"view/title": [
+				{
+					"command": "ReqIdView.refresh",
+					"when": "view == ReqIdView",
+					"group": "navigation"
+				}
+			]
+		},
+		"configuration": [
+			{
+				"title": "SOAR Requirement checker",
+				"properties": {
+					"requirement.regexid": {
+						"type": "string",
+						"default": "^id\\: SOAR-(\\d+)-(.*)-(\\d+)",
+						"description": "Regexp to search a requirement id"
+					}
 				}
 			}
 		]
