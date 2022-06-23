@@ -5,7 +5,7 @@
 	"name": "soar-reqdef",
 	"displayName": "SOARRequirementHelper",
 	"description": "SOAR Helper for requirement definition",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"private": true,
 	"license": "MIT",
 	"repository": {
