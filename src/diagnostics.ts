@@ -10,12 +10,19 @@ import * as vscode from "vscode";
 export const REQDEF_MENTION = "requirement_id";
 
 /** String to detect in the text document. */
-const REQDEF = "id: SOAR-";
-const regexp = /^id\: SOAR-(\d+)-(.*)-(\d+)/;
+const REGEXID: string = "^id\\: SOAR-(\\d+)-(.*)-(\\d+)";
 
+
+function getReq(txt: vscode.TextLine, regexp: RegExp): string | null {
+  const matches = txt.text.match(regexp);
+  if (matches) {
+    const source = `SOAR-${matches[1]}-${matches[2]}-${matches[3]}`;
+    return source;
+  }
+  return null;
+}
 /**
  * Analyzes the text document for problems.
- * This demo diagnostic problem provider finds all mentions of 'emoji'.
  * @param doc text document to analyze
  * @param reqdefDiagnostics diagnostic collection
  */
@@ -25,14 +32,20 @@ export function refreshDiagnostics(
 ): void {
   const diagnostics: vscode.Diagnostic[] = [];
 
+  const regexp = new RegExp(vscode.workspace.getConfiguration('requirement').get('regexid') ?? REGEXID);
+
   for (let lineIndex = 0; lineIndex < doc.lineCount; lineIndex++) {
     const lineOfText = doc.lineAt(lineIndex);
-    if (lineOfText.text.match(regexp)) {
+    const matches = lineOfText.text.match(regexp);
+    if (matches) {
       let severity = vscode.DiagnosticSeverity.Information;
-      if (alreadyExist(diagnostics, lineOfText.text)) {
+      if (alreadyExist(diagnostics, getReq(lineOfText, regexp))) {
         severity = vscode.DiagnosticSeverity.Error;
       }
-      diagnostics.push(createDiagnostic(doc, lineOfText, lineIndex, severity));
+      const diag = createDiagnostic(doc, lineOfText, lineIndex, severity, regexp);
+      if (diag !== null) {
+        diagnostics.push(diag);
+      }
     }
   }
 
@@ -43,10 +56,16 @@ function createDiagnostic(
   doc: vscode.TextDocument,
   lineOfText: vscode.TextLine,
   lineIndex: number,
-  severity: vscode.DiagnosticSeverity
-): vscode.Diagnostic {
+  severity: vscode.DiagnosticSeverity,
+  regexp: RegExp
+): vscode.Diagnostic | null {
   // find where in the line of that the 'emoji' is mentioned
   const matches = lineOfText.text.match(regexp);
+
+  if (matches === null || matches?.length < 3) {
+    return null;
+  }
+
   let index = lineOfText.text.length;
 
   // create range that represents, where in the document the word is
@@ -57,7 +76,8 @@ function createDiagnostic(
     lineOfText.text.length
   );
 
-  const diagnostic = new vscode.Diagnostic(range, lineOfText.text, severity);
+  const source = `SOAR-${matches[1]}-${matches[2]}-${matches[3]}`;
+  const diagnostic = new vscode.Diagnostic(range, source, severity);
 
   if (severity === vscode.DiagnosticSeverity.Error) {
     const range2 = new vscode.Range(
@@ -75,9 +95,11 @@ function createDiagnostic(
       ),
     ];
   }
-  diagnostic.source = lineOfText.text;
+  diagnostic.source = source;
   diagnostic.code = REQDEF_MENTION;
+
   console.log("createDiag: " + diagnostic.source);
+
   return diagnostic;
 }
 
@@ -112,11 +134,11 @@ export function subscribeToDocumentChanges(
   );
 }
 
-function alreadyExist(diagnostics: vscode.Diagnostic[], text: string): boolean {
+function alreadyExist(diagnostics: vscode.Diagnostic[], text: string | null): boolean {
   for (let i = 0; i < diagnostics.length; i++) {
     if (
       diagnostics[i].code === REQDEF_MENTION &&
-      diagnostics[i].message.includes(text)
+      diagnostics[i].source === text
     ) {
       return true;
     }

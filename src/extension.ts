@@ -7,57 +7,29 @@ import { ReqIDOutlineProvider } from "./reqIdView"
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-  // Use the console to output diagnostic information (console.log) and errors (console.error)
-  // This line of code will only be executed once when your extension is activated
-  console.log('Congratulations, your extension "reqdef" is now active!');
-
-  // The command has been defined in the package.json file
-  // Now provide the implementation of the command with registerCommand
-  // The commandId parameter must match the command field in package.json
-  let disposable = vscode.commands.registerCommand("reqdef.helloWorld", () => {
-    // The code you place here will be executed every time your command is executed
-    // Display a message box to the user
-    vscode.window.showInformationMessage("Hello World from ReqDef!");
-  });
-
-  context.subscriptions.push(disposable);
-
-  /*
-  context.subscriptions.push(
-    vscode.languages.registerCodeActionsProvider(
-      { pattern: "**" },
-      new ReqDefNumbering(),
-      {
-        providedCodeActionKinds: ReqDefNumbering.providedCodeActionKinds,
-      }
-    )
-  );
-  */
 
   const reqDefDiagnostics =
     vscode.languages.createDiagnosticCollection("req-def");
-	
+
   context.subscriptions.push(reqDefDiagnostics);
 
   context.subscriptions.push(
-	vscode.languages.registerCodeActionsProvider("markdown", new ReqDefInfo(), {
-		providedCodeActionKinds: ReqDefInfo.providedCodeActionKinds
-	}));
+    vscode.languages.registerCodeActionsProvider("markdown", new ReqDefInfo(), {
+      providedCodeActionKinds: ReqDefInfo.providedCodeActionKinds
+    }));
 
   subscribeToDocumentChanges(context, reqDefDiagnostics);
   const reqIdProvider = new ReqIDOutlineProvider(context, reqDefDiagnostics);
-  //context.subscriptions.push();
+
   vscode.window.registerTreeDataProvider("ReqIdView", reqIdProvider);
+
   vscode.commands.registerCommand('ReqIdView.refresh', () => reqIdProvider.refresh());
+
   vscode.commands.registerCommand('extension.openReqIdSelection', range => reqIdProvider.select(range));
 }
 
-interface MyInlineCompletionItem extends vscode.InlineCompletionItem {
-  someTrackingId: number;
-}
-
 // this method is called when your extension is deactivated
-export function deactivate() {}
+export function deactivate() { }
 
 export class ReqDefNumbering implements vscode.CodeActionProvider {
   public static readonly providedCodeActionKinds = [
@@ -124,36 +96,36 @@ export class ReqDefNumbering implements vscode.CodeActionProvider {
       "Learn more...",
       vscode.CodeActionKind.Empty
     );
-	/*
-    action.command = {
-      command: COMMAND,
-      title: "Learn more about emojis",
-      tooltip: "This will open the unicode emoji page.",
-    };
-	*/
+    /*
+      action.command = {
+        command: COMMAND,
+        title: "Learn more about emojis",
+        tooltip: "This will open the unicode emoji page.",
+      };
+    */
     return action;
   }
 }
 
 export class ReqDefInfo implements vscode.CodeActionProvider {
 
-	public static readonly providedCodeActionKinds = [
-		vscode.CodeActionKind.Empty
-	];
+  public static readonly providedCodeActionKinds = [
+    vscode.CodeActionKind.Empty
+  ];
 
-	provideCodeActions(document: vscode.TextDocument, range: vscode.Range | vscode.Selection, context: vscode.CodeActionContext, token: vscode.CancellationToken): vscode.CodeAction[] {
-		// for each diagnostic entry that has the matching `code`, create a code action command
-		return context.diagnostics
-			.filter(diagnostic => (diagnostic.code === REQDEF_MENTION && diagnostic.severity === vscode.DiagnosticSeverity.Error))
-			.map(diagnostic => this.createCommandCodeAction(diagnostic));
-	}
+  provideCodeActions(document: vscode.TextDocument, range: vscode.Range | vscode.Selection, context: vscode.CodeActionContext, token: vscode.CancellationToken): vscode.CodeAction[] {
+    // for each diagnostic entry that has the matching `code`, create a code action command
+    return context.diagnostics
+      .filter(diagnostic => (diagnostic.code === REQDEF_MENTION && diagnostic.severity === vscode.DiagnosticSeverity.Error))
+      .map(diagnostic => this.createCommandCodeAction(diagnostic));
+  }
 
-	private createCommandCodeAction(diagnostic: vscode.Diagnostic): vscode.CodeAction {
-		console.log(diagnostic);
-		const action = new vscode.CodeAction('Learn more...', diagnostic.severity === vscode.DiagnosticSeverity.Error ? vscode.CodeActionKind.QuickFix : vscode.CodeActionKind.Empty);
-		//action.command = { command: COMMAND, title: 'Learn more about emojis', tooltip: 'This will open the unicode emoji page.' };
-		action.diagnostics = [diagnostic];
-		action.isPreferred = true;
-		return action;
-	}
+  private createCommandCodeAction(diagnostic: vscode.Diagnostic): vscode.CodeAction {
+    console.log(diagnostic);
+    const action = new vscode.CodeAction('Learn more...', diagnostic.severity === vscode.DiagnosticSeverity.Error ? vscode.CodeActionKind.QuickFix : vscode.CodeActionKind.Empty);
+    //action.command = { command: COMMAND, title: 'Learn more about emojis', tooltip: 'This will open the unicode emoji page.' };
+    action.diagnostics = [diagnostic];
+    action.isPreferred = true;
+    return action;
+  }
 }
