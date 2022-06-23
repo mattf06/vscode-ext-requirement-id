@@ -10,8 +10,17 @@ import * as vscode from "vscode";
 export const REQDEF_MENTION = "requirement_id";
 
 /** String to detect in the text document. */
-const REGEXID:string = "^id\\: SOAR-(\\d+)-(.*)-(\\d+)";
+const REGEXID: string = "^id\\: SOAR-(\\d+)-(.*)-(\\d+)";
 
+
+function getReq(txt: vscode.TextLine, regexp: RegExp): string | null {
+  const matches = txt.text.match(regexp);
+  if (matches) {
+    const source = `SOAR-${matches[1]}-${matches[2]}-${matches[3]}`;
+    return source;
+  }
+  return null;
+}
 /**
  * Analyzes the text document for problems.
  * @param doc text document to analyze
@@ -27,10 +36,10 @@ export function refreshDiagnostics(
 
   for (let lineIndex = 0; lineIndex < doc.lineCount; lineIndex++) {
     const lineOfText = doc.lineAt(lineIndex);
-    
-    if (lineOfText.text.match(regexp)) {
+    const matches = lineOfText.text.match(regexp);
+    if (matches) {
       let severity = vscode.DiagnosticSeverity.Information;
-      if (alreadyExist(diagnostics, lineOfText.text)) {
+      if (alreadyExist(diagnostics, getReq(lineOfText, regexp))) {
         severity = vscode.DiagnosticSeverity.Error;
       }
       const diag = createDiagnostic(doc, lineOfText, lineIndex, severity, regexp);
@@ -125,11 +134,11 @@ export function subscribeToDocumentChanges(
   );
 }
 
-function alreadyExist(diagnostics: vscode.Diagnostic[], text: string): boolean {
+function alreadyExist(diagnostics: vscode.Diagnostic[], text: string | null): boolean {
   for (let i = 0; i < diagnostics.length; i++) {
     if (
       diagnostics[i].code === REQDEF_MENTION &&
-      diagnostics[i].message.includes(text)
+      diagnostics[i].source === text
     ) {
       return true;
     }
