@@ -6,6 +6,7 @@
 
 import * as vscode from "vscode";
 
+
 /** Code that is used to associate diagnostic entries with code actions. */
 export const REQDEF_MENTION = "requirement_id";
 
