@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
 import * as path from 'path';
+import { ReqIDParser, ReqInfo } from "./parser";
 
 export class ReqIDOutlineProvider
     implements vscode.TreeDataProvider<vscode.Diagnostic>
@@ -12,6 +13,7 @@ export class ReqIDOutlineProvider
     private _diagnostics: vscode.DiagnosticCollection;
     private editor?: vscode.TextEditor;
     private context: vscode.ExtensionContext;
+    private reqInfos: Record<string, ReqInfo> = {};
 
     constructor(
         context: vscode.ExtensionContext,
@@ -44,7 +46,7 @@ export class ReqIDOutlineProvider
                 }
             }
         } else {
-            vscode.commands.executeCommand('setContext', 'reqidOutlineEnabled',false);
+            vscode.commands.executeCommand('setContext', 'reqidOutlineEnabled', false);
         }
     }
 
@@ -71,6 +73,12 @@ export class ReqIDOutlineProvider
             this._onDidChangeTreeData.fire();
         }
         */
+
+        if (this.editor) {
+            const parser = new ReqIDParser(this.editor?.document);
+            this.reqInfos = parser.getReqInfo();
+            console.log(this.reqInfos);
+        }
         this._onDidChangeTreeData.fire();
     }
 
@@ -98,12 +106,15 @@ export class ReqIDOutlineProvider
                     dark: this.context.asAbsolutePath(path.join('resources', 'dark', 'check.svg'))
                 };
             }
-            else
-            {
+            else {
                 treeItem.iconPath = {
                     light: this.context.asAbsolutePath(path.join('resources', 'light', 'error.svg')),
                     dark: this.context.asAbsolutePath(path.join('resources', 'dark', 'error.svg'))
                 };
+            }
+            const req = this.reqInfos[element.range.start.line];
+            if (req) {
+                treeItem.tooltip = new vscode.MarkdownString(`**Title:** ${req.title}\n\r**Applicability:** ${req.applicability}\n\r**Version:** ${req.version}\n\r**Regulation:** ${req.regulation}\n\r**MyFX:** ${req.myFx}`);
             }
             return treeItem;
         } else {
