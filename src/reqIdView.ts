@@ -63,21 +63,11 @@ export class ReqIDOutlineProvider
     }
 
     public refresh(): void {
-        console.log("refresh");
-        /*
-        if (this.editor && this._diagnostics.has(this.editor.document.uri)) {
-            const diagnostics: vscode.Diagnostic[] = [];
-            this._diagnostics
-                .get(this.editor.document.uri)
-                ?.map((diag) => diagnostics.push(diag));
-            this._onDidChangeTreeData.fire();
-        }
-        */
-
+        //console.log("refresh");
         if (this.editor) {
             const parser = new ReqIDParser(this.editor?.document);
             this.reqInfos = parser.getReqInfo();
-            console.log(this.reqInfos);
+            //console.log(this.reqInfos);
         }
         this._onDidChangeTreeData.fire();
     }

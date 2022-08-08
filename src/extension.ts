@@ -121,7 +121,7 @@ export class ReqDefInfo implements vscode.CodeActionProvider {
   }
 
   private createCommandCodeAction(diagnostic: vscode.Diagnostic): vscode.CodeAction {
-    console.log(diagnostic);
+    //console.log(diagnostic);
     const action = new vscode.CodeAction('Learn more...', diagnostic.severity === vscode.DiagnosticSeverity.Error ? vscode.CodeActionKind.QuickFix : vscode.CodeActionKind.Empty);
     //action.command = { command: COMMAND, title: 'Learn more about emojis', tooltip: 'This will open the unicode emoji page.' };
     action.diagnostics = [diagnostic];
